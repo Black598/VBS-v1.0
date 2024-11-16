@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ImageBackground, StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import DataStore from './DataStore'; // Importando o DataStore
@@ -11,13 +11,18 @@ const AgendaSemanal: React.FC = () => {
   // Obtém o mês atual (1 para janeiro, 12 para dezembro)
   const currentMonth = new Date().getMonth() + 1;
 
-  // Filtra os agendamentos para o mês atual
+  // Estado para armazenar os agendamentos
   const [schedules, setSchedules] = useState(
     DataStore.getSchedules().filter(schedule => parseInt(schedule.month) === currentMonth)
   );
 
+  // Função para atualizar os agendamentos
+  const updateSchedules = () => {
+    setSchedules(DataStore.getSchedules().filter(schedule => parseInt(schedule.month) === currentMonth));
+  };
+
   // Função para excluir um agendamento
-  const handleDelete = (index: number) => {
+  const handleDelete = (id: number) => {
     Alert.alert(
       'Excluir Agendamento',
       'Tem certeza que deseja excluir este agendamento?',
@@ -30,15 +35,24 @@ const AgendaSemanal: React.FC = () => {
           text: 'Excluir',
           style: 'destructive',
           onPress: () => {
-            DataStore.deleteSchedule(index); // Remove do DataStore
-            setSchedules(
-              DataStore.getSchedules().filter(schedule => parseInt(schedule.month) === currentMonth)
-            ); // Atualiza o estado local apenas para o mês atual
+            DataStore.deleteSchedule(id); // Remove do DataStore
+            updateSchedules(); // Atualiza a tela com os dados mais recentes
           },
         },
       ]
     );
   };
+
+  // UseEffect para ouvir as mudanças no DataStore
+  useEffect(() => {
+    // Adiciona o listener ao DataStore
+    DataStore.addListener(updateSchedules);
+
+    // Remove o listener quando o componente for desmontado
+    return () => {
+      DataStore.addListener(() => {}); // Remover listener ao desmontar
+    };
+  }, []); // Apenas uma vez, ao montar o componente
 
   return (
     <SafeAreaProvider>
@@ -48,8 +62,8 @@ const AgendaSemanal: React.FC = () => {
             <Text style={styles.title}>Agenda Semanal</Text>
             <ScrollView>
               {schedules.length > 0 ? (
-                schedules.map((schedule, index) => (
-                  <View key={index} style={styles.scheduleItem}>
+                schedules.map((schedule) => (
+                  <View key={schedule.id} style={styles.scheduleItem}>
                     <View style={styles.scheduleTextContainer}>
                       <Text style={styles.text}>Cliente: {schedule.clientName}</Text>
                       <Text style={styles.text}>
@@ -58,7 +72,7 @@ const AgendaSemanal: React.FC = () => {
                     </View>
                     <TouchableOpacity
                       style={styles.deleteButton}
-                      onPress={() => handleDelete(index)}
+                      onPress={() => handleDelete(schedule.id)}
                     >
                       <Text style={styles.deleteButtonText}>Excluir</Text>
                     </TouchableOpacity>
