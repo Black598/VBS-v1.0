@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
-import { ImageBackground, StyleSheet, View, Text, TextInput, Modal, TouchableOpacity } from 'react-native';
+import {
+  ImageBackground,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-
-const image: { uri: string } = { 
-  uri: 'https://img.freepik.com/fotos-gratis/fundo-abstrato-da-festa_23-2147718249.jpg' 
+const image: { uri: string } = {
+  uri: 'https://img.freepik.com/fotos-gratis/fundo-abstrato-da-festa_23-2147718249.jpg',
 };
 
-
 const App: React.FC = () => {
-  // Definindo os estados para o Dia, Mês e Ano
+  const [clientName, setClientName] = useState<string>('');
   const [day, setDay] = useState<string>('');
   const [month, setMonth] = useState<string>('');
   const [year, setYear] = useState<string>('');
-
-  const [modalVisible, setModalVisible] = useState<boolean>(false); // Para controlar a visibilidade do Modal
-  const [modalType, setModalType] = useState<string>(''); // Para saber qual modal abrir (Dia, Mês ou Ano)
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalType, setModalType] = useState<string>('');
+  const navigation = useNavigation();
 
   const openModal = (type: string) => {
     setModalType(type);
@@ -24,60 +33,114 @@ const App: React.FC = () => {
 
   const closeModal = () => setModalVisible(false);
 
-  const handleDaySelect = (day: any) => {
-    setDay(day.dateString); // Recebe a data no formato 'YYYY-MM-DD'
+  const handleSelection = (value: string) => {
+    if (modalType === 'day') setDay(value);
+    if (modalType === 'month') setMonth(value);
+    if (modalType === 'year') setYear(value);
     closeModal();
+  };
+
+  const renderOptions = () => {
+    let options: string[] = [];
+
+    if (modalType === 'day') {
+      options = Array.from({ length: 30 }, (_, i) => (i + 1).toString());
+    } else if (modalType === 'month') {
+      options = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
+    } else if (modalType === 'year') {
+      options = Array.from({ length: 7 }, (_, i) => (2024 + i).toString());
+    }
+
+    return options.map((value) => (
+      <TouchableOpacity
+        key={value}
+        style={styles.option}
+        onPress={() => handleSelection(value)}
+      >
+        <Text style={styles.optionText}>{value}</Text>
+      </TouchableOpacity>
+    ));
+  };
+
+  const handleSchedule = () => {
+    if (!clientName || !day || !month || !year) {
+      Alert.alert('Erro', 'Preencha todas as informações para agendar.');
+      return;
+    }
+
+    Alert.alert('Agendado', `Cliente: ${clientName}\nData: ${day}/${month}/${year}`);
+    // Aqui você pode salvar os dados no backend ou local storage
+  };
+
+  const handleViewAgenda = () => {
+    navigation.navigate('AgendaSemanal' as never); // Navega para o arquivo AgendaSemanal.tsx
   };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <ImageBackground 
-          source={image} 
-          resizeMode="cover" 
-          style={styles.fullScreenImage}>
+        <ImageBackground
+          source={image}
+          resizeMode="cover"
+          style={styles.fullScreenImage}
+        >
           <View style={styles.boxContainer}>
             <View style={styles.blackBox}>
               <Text style={styles.title}>AGENDAR CLIENTES</Text>
               <Text style={styles.texto}>Nome do Cliente</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Digite o texto aqui"
+                placeholder="Digite o nome aqui"
+                placeholderTextColor="white"
+                value={clientName}
+                onChangeText={setClientName}
               />
               <Text style={styles.texto2}>Data de Agendamento</Text>
 
-              {/* Dia */}
-              <TouchableOpacity onPress={() => openModal('day')}>
-                <Text style={styles.texto}>Dia: {day || 'Selecione'}</Text>
-              </TouchableOpacity>
+              {/* Botões para Dia, Mês e Ano lado a lado */}
+              <View style={styles.row}>
+                <TouchableOpacity onPress={() => openModal('day')} style={styles.dateButton}>
+                  <Text style={styles.texto}>Dia: {day || 'Selecione'}</Text>
+                </TouchableOpacity>
 
-              {/* Mês */}
-              <TouchableOpacity onPress={() => openModal('month')}>
-                <Text style={styles.texto}>Mês: {month || 'Selecione'}</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => openModal('month')} style={styles.dateButton}>
+                  <Text style={styles.texto}>Mês: {month || 'Selecione'}</Text>
+                </TouchableOpacity>
 
-              {/* Ano */}
-              <TouchableOpacity onPress={() => openModal('year')}>
-                <Text style={styles.texto}>Ano: {year || 'Selecione'}</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => openModal('year')} style={styles.dateButton}>
+                  <Text style={styles.texto}>Ano: {year || 'Selecione'}</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Botões Agendar e Ver Agenda */}
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.actionButton} onPress={handleSchedule}>
+                  <Text style={styles.buttonText}>Agendar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleViewAgenda}>
+                  <Text style={styles.buttonText}>Ver Agenda</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
-          {/* Modal de Seleção para o Dia com Calendário */}
+          {/* Modal */}
           <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            onRequestClose={closeModal}>
+            onRequestClose={closeModal}
+          >
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
-                {modalType === 'day' && (
-                  <>
-                    <Text style={styles.modalTitle}>Selecione o Dia</Text>
-                    
-                  </>
-                )}
-                {/* Você pode adicionar outros modais para mês e ano aqui */}
+                <Text style={styles.modalTitle}>
+                  {modalType === 'day' && 'Selecione o Dia'}
+                  {modalType === 'month' && 'Selecione o Mês'}
+                  {modalType === 'year' && 'Selecione o Ano'}
+                </Text>
+                <ScrollView contentContainerStyle={styles.optionsContainer}>
+                  {renderOptions()}
+                </ScrollView>
                 <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                   <Text style={styles.closeButtonText}>Fechar</Text>
                 </TouchableOpacity>
@@ -99,46 +162,80 @@ const styles = StyleSheet.create({
   },
   boxContainer: {
     flex: 1,
-    justifyContent: 'center', // Centraliza verticalmente
-    alignItems: 'center', // Centraliza horizontalmente
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   blackBox: {
-    backgroundColor: 'black', // Cor de fundo preta
-    borderRadius: 20, // Bordas arredondadas com raio de 20
-    width: 351, // Largura de 351 pixels
-    height: 628, // Altura de 628 pixels
-    justifyContent: 'center', // Alinha os filhos (título e caixa de texto) verticalmente
-    alignItems: 'center', // Centraliza horizontalmente
-    padding: 20, // Espaçamento interno para não colar os elementos nas bordas
+    backgroundColor: 'black',
+    borderRadius: 20,
+    width: 351,
+    height: 628,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   title: {
-    color: 'white', // Cor do texto
-    fontSize: 24, // Tamanho da fonte do título
-    fontWeight: 'bold', // Peso da fonte
-    marginBottom: 20, // Espaço entre o título e o campo de texto
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   texto: {
-    color: 'white', // Cor do texto
-    fontSize: 16, // Tamanho da fonte do título
-    fontWeight: 'bold', // Peso da fonte
-    marginBottom: 10, // Espaço entre o título e o campo de texto
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   texto2: {
-    color: 'white', // Cor do texto
-    fontSize: 16, // Tamanho da fonte do título
-    fontWeight: 'bold', // Peso da fonte
-    marginBottom: 20, // Espaço entre o título e o campo de texto
-    marginTop: 20, // Espaço entre o campo de texto e o campo de cliente
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: 20,
   },
   textInput: {
-    width: 223, // Largura da caixa de texto
-    height: 30, // Altura da caixa de texto
-    borderColor: 'white', // Cor da borda
-    borderWidth: 1, // Espessura da borda
-    borderRadius: 5, // Bordas arredondadas na caixa de texto
-    color: 'white', // Cor do texto
-    paddingLeft: 10, // Espaço interno à esquerda
-    fontSize: 14, // Tamanho da fonte
+    width: 223,
+    height: 30,
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 5,
+    color: 'white',
+    paddingLeft: 10,
+    fontSize: 14,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
+  dateButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 10,
+    backgroundColor: '#333',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  actionButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   modalBackground: {
     flex: 1,
@@ -151,18 +248,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  option: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5,
+  },
+  optionText: {
+    fontSize: 16,
+    color: 'black',
   },
   closeButton: {
     marginTop: 20,
     backgroundColor: '#ff5c5c',
     padding: 10,
     borderRadius: 5,
+    alignItems: 'center',
   },
   closeButtonText: {
     color: 'white',
