@@ -12,6 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import DataStore from './DataStore'; // Importando o DataStore
+
+
+
 
 const image: { uri: string } = {
   uri: 'https://img.freepik.com/fotos-gratis/fundo-abstrato-da-festa_23-2147718249.jpg',
@@ -62,15 +66,17 @@ const App: React.FC = () => {
     ));
   };
 
-  const handleSchedule = () => {
-    if (!clientName || !day || !month || !year) {
-      Alert.alert('Erro', 'Preencha todas as informações para agendar.');
-      return;
-    }
+ const handleSchedule = () => {
+  if (!clientName || !day || !month || !year) {
+    Alert.alert('Erro', 'Preencha todas as informações para agendar.');
+    return;
+  }
 
-    Alert.alert('Agendado', `Cliente: ${clientName}\nData: ${day}/${month}/${year}`);
-    // Aqui você pode salvar os dados no backend ou local storage
-  };
+  // Adiciona o agendamento ao DataStore
+  DataStore.addSchedule({ clientName, day, month, year });
+
+  Alert.alert('Agendado', `Cliente: ${clientName}\nData: ${day}/${month}/${year}`);
+};
 
   const handleViewAgenda = () => {
     navigation.navigate('AgendaSemanal' as never); // Navega para o arquivo AgendaSemanal.tsx

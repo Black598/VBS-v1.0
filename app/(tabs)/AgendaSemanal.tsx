@@ -15,21 +15,8 @@ const App: React.FC = () => (
         resizeMode="cover" 
         style={styles.fullScreenImage}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => Alert.alert('agendar clientes')}>
-            <Text style={styles.buttonText}>AGENDAR CLIENTES</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => Alert.alert('agenda semanal')}>
-            <Text style={styles.buttonText}>AGENDA SEMANAL</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => Alert.alert('agenda mensal')}>
-            <Text style={styles.buttonText}>AGENDA MENSAL</Text>
-          </TouchableOpacity>
+          
+          
         </View>
       </ImageBackground>
     </SafeAreaView>
