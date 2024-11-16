@@ -2,9 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, StyleSheet, View, Text, ImageBackground, TouchableOpacity } from 'react-native';
-import EntradaSaida from './EntradaSaida';
-import LucroMensal from './LucroMensal';
-import LucroAnual from './LucroAnual';
+
 
 // Tela principal com os botões
 const MainScreen = ({ navigation }: any) => {
@@ -14,21 +12,7 @@ const MainScreen = ({ navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <ImageBackground source={image} resizeMode="cover" style={styles.fullScreenImage}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('EntradaSaida')}>
-            <Text style={styles.buttonText}>ENTRADA E SAÍDA</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('LucroMensal')}>
-            <Text style={styles.buttonText}>LUCRO MENSAL</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('LucroAnual')}>
             <Text style={styles.buttonText}>LUCRO ANUAL</Text>
-          </TouchableOpacity>
         </View>
       </ImageBackground>
     </SafeAreaView>
@@ -42,9 +26,6 @@ const App = () => {
     
       <Stack.Navigator initialRouteName="MainScreen">
         <Stack.Screen name="MainScreen" component={MainScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="EntradaSaida" component={EntradaSaida} />
-        <Stack.Screen name="LucroMensal" component={LucroMensal} />
-        <Stack.Screen name="LucroAnual" component={LucroAnual} />
       </Stack.Navigator>
     
   );
