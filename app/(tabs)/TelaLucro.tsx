@@ -1,18 +1,14 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ImageBackground, StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
-
-import TelaCliente from './TelaCliente';
-import TelaLucro from './TelaLucro';
-
-const Stack = createNativeStackNavigator();
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import 'react-native-gesture-handler';
 
 const image: { uri: string } = { 
-  uri: 'https://img.freepik.com/vetores-gratis/premio-abstrato-preto-e-dourado-fundo-geometrico_1017-24783.jpg' 
+  uri: 'https://img.freepik.com/fotos-gratis/fundo-abstrato-da-festa_23-2147718249.jpg' 
 };
-const HomeScreen: React.FC = ({ navigation }: any) => (
-<SafeAreaProvider>
+
+const App: React.FC = () => (
+  <SafeAreaProvider>
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <ImageBackground 
         source={image} 
@@ -21,31 +17,19 @@ const HomeScreen: React.FC = ({ navigation }: any) => (
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.button} 
-            onPress={() => navigation.navigate('TelaCliente')}>
+            onPress={() => Alert.alert('Botão CLIENTES pressionado')}>
             <Text style={styles.buttonText}>CLIENTES</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.button} 
-            onPress={() => navigation.navigate('TelaLucro')}>
+            onPress={() => Alert.alert('Botão LUCRO pressionado')}>
             <Text style={styles.buttonText}>LUCRO</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
     </SafeAreaView>
   </SafeAreaProvider>
-  );
-
-const App: React.FC = () => { return(
-  
-      <Stack.Navigator>
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{ headerShown: false }} 
-        />
-      </Stack.Navigator>
-    
-)};
+);
 
 const styles = StyleSheet.create({
   container: {
