@@ -9,22 +9,24 @@ export type Schedule = {
   class DataStore {
     private schedules: Schedule[] = []; // Armazena os agendamentos
   
-    // Adiciona um novo agendamento
     addSchedule(schedule: Schedule) {
       this.schedules.push(schedule);
     }
   
-    // Retorna todos os agendamentos
     getSchedules() {
       return this.schedules;
     }
   
-    // Limpa todos os agendamentos (opcional)
+    deleteSchedule(index: number) {
+      if (index >= 0 && index < this.schedules.length) {
+        this.schedules.splice(index, 1); // Remove o item pelo índice
+      }
+    }
+  
     clearSchedules() {
       this.schedules = [];
     }
   }
   
-  // Exporta uma única instância da classe
   export default new DataStore();
   
